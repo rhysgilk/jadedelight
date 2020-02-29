@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Jade Delight</title>
+    <style>
+        p {
+            display: inline-block;
+            line-height: 0px;
+            margin-top: 0px;
+            font-size: 20px;
+        }
+        br {
+        }
+        #lnameError, #phoneError, #streetError, #cityError {
+            color: red;
+            font-weight: bold;
+        }
+        h1 {
+            color: green;
+            font-weight: bold;
+            font-family: serif;
+            text-align: center;
+        }
+        body {
+            background-color: #e8fbea;
+        }
+        th {
+            color: green;
+            font-style: italic;
+        }
+        tr {
+            font-size: 20px;
+        }
+        table {
+            border: 2px solid green;
+        }
+    </style>
+</head>
+
+<body>
+<script language="javascript">
+
+function MenuItem(name, cost)
+{
+    this.name = name;
+    this.cost = cost;
+}
+
+menuItems = new Array(
+    new MenuItem("Chicken Chop Suey", 4.5),
+    new MenuItem("Sweet and Sour Pork", 6.25),
+    new MenuItem("Shrimp Lo Mein", 5.25),
+    new MenuItem("Moo Shi Chicken", 6.5),
+    new MenuItem("Fried Rice", 2.35)
+);
+
+function makeSelect(name, minRange, maxRange)
+{
+    var t= "";
+    t = "<select onchange='updateTotal()' name='" + name + 
+        "' size='1'>";
+    for (j=minRange; j<=maxRange; j++)
+       t += "<option value='" + j + "'>" + j + "</option>";
+    t+= "</select>"; 
+    return t;
+}
+</script>
+
+<h1>Jade Delight</h1><hr />
+<form onsubmit="return validateForm()">
+
+<p>First Name: <input type="text"  name='fname' /></p><br />
+<p>Last Name*:  <input type="text"  name='lname' /></p>
+<span id="lnameError"></span><br />
+<p>Street: <input type="text"  name='street' /></p>
+<span id="streetError"></span><br />
+<p>City: <input type="text"  name='city' /></p>
+<span id="cityError"></span><br />
+<p>Phone*: <input type="text"  name='phone' />
+</p><span id="phoneError"></span><br />
+<p> 
+    <input type="radio"  name="p_or_d" value = "pickup" 
+           checked="checked"/>Pickup
+    <input type="radio"  name='p_or_d' value = 'delivery'/>
+    Delivery
+</p><br />
+<table border="0" cellpadding="3">
+  <tr>
+    <th>Select Item</th>
+    <th>Item Name</th>
+    <th>Cost Each</th>
+    <th>Total Cost</th>
+  </tr>
+<script language="javascript">
+
+  var s = "";
+  for (i=0; i< menuItems.length; i++)
+  {
+      s += "<tr><td>";
+      s += makeSelect("quan" + i, 0, 10);
+      s += "</td><td>" + menuItems[i].name + "</td>";
+      s += "<td> $ " + menuItems[i].cost.toFixed(2) + "</td>";
+      s += "<td>$<input type='text' name='cost'/></td></tr>";
+  }
+  document.writeln(s);
+</script>
+</table><br />
+<p>Subtotal: 
+   $<input type="text"  name='subtotal' id="subtotal" />
+</p><br />
+<p>Mass tax 6.25%:
+   $<input type="text"  name='tax' id="tax" />
+</p><br />
+<p>Total:
+   $<input type="text"  name='total' id="total" />
+</p><br />
+<script language="javascript">
+var form = document.forms[0];
+function updateTotal(){
+    let prices = [4.5, 6.25, 5.25, 6.5, 2.35];
+    for (i = 0; i < 5; i++) {
+        item = (document.getElementsByName("quan" + i))[0].value;
+        if (parseInt(item) != 0)
+            (document.getElementsByName("cost"))[i].value = 
+            parseInt(item) * prices[i];
+    }
+    calculate();
+}
+function calculate(){
+    total = 0.00;
+    for (i = 0; i < 5; i++) {
+        var curr = (document.getElementsByName("cost"))[i].value;
+        if (parseFloat(curr))
+            total += parseFloat(curr);  
+    }
+    document.getElementById("subtotal").value = (total).toFixed(2);
+    document.getElementById("tax").value = (total * .0625).toFixed(2);
+    document.getElementById("total").value = (total * 1.0625).toFixed(2);
+}
+function resetDiv(){
+    document.getElementById("lnameError").innerHTML = "";
+    document.getElementById("phoneError").innerHTML = "";
+    document.getElementById("streetError").innerHTML = "";
+    document.getElementById("cityError").innerHTML = "";
+}
+function checkPhone(focused){
+    valid = true;
+    phonenum = (document.getElementsByName("phone"))[0].value;
+    if (phonenum == "" || phonenum.length == 0 || phonenum == null){
+        document.getElementById("phoneError").innerHTML = 
+            "Phone number not entered!";
+        valid = false;
+    } else {
+        var newNum = "";
+        for (var i = 0; i < phonenum.length; i++) {
+            if (phonenum.charAt(i) >= 0 && phonenum.charAt(i) <= 9)
+                newNum += phonenum.charAt(i);
+        }
+        if (newNum.length != 10 && newNum.length != 7){
+            document.getElementById("phoneError").innerHTML = 
+                "Invalid phone number! " + 
+                "Please enter 7 digits with or without an area code.";
+            valid = false;
+        }
+    }
+    if (!valid && !focused)
+        (document.getElementsByName("phone"))[0].focus();
+    return valid;
+}
+function validateForm(){
+    var valid = true;
+    var focused = false;
+    calculate();
+    resetDiv();
+    lastname = (document.getElementsByName("lname"))[0].value;
+    if (lastname == "" || lastname.length == 0 || lastname == null){
+        document.getElementById("lnameError").innerHTML = 
+            "Last name not entered!";
+        valid = false;
+        (document.getElementsByName("lname"))[0].focus();
+        focused = true;
+    }
+    city = (document.getElementsByName("city"))[0].value;
+    street = (document.getElementsByName("street"))[0].value;
+    if ((document.getElementsByName("p_or_d"))[0].checked == false){
+        if (street == "" || street.length == 0 || street == null){
+            document.getElementById("streetError").innerHTML = 
+                "Please add a valid street!";
+            valid = false;
+            if (!focused){
+                (document.getElementsByName("street"))[0].focus();
+                focused = true;
+            }
+        }
+        if (city == "" || city.length == 0 || city == null){
+            document.getElementById("cityError").innerHTML = 
+                "Please add a valid city!";
+            valid = false;
+            if (!focused){
+                (document.getElementsByName("city"))[0].focus();
+                focused = true;
+            }
+        }
+    }
+    if (!checkPhone(focused))
+        valid = false;
+    if (valid){
+        display();
+    }
+    return valid;
+}
+function display(){
+    var time = new Date();
+    var mins;
+    var hrs = time.getHours();
+    if ((document.getElementsByName("p_or_d"))[0].checked == false){
+        mins = time.getMinutes() + 30;
+    }else{
+        mins = time.getMinutes() + 15;
+    }
+    if (mins >= 60){
+        mins -= 60;
+        hrs += 1;
+        if (mins < 10){
+            temp = mins;
+            mins = "0" + temp;
+        }
+    }
+    var timeDisplay = "";
+    if (hrs > 12){
+        timeDisplay += (hrs - 12) + ":";
+        timeDisplay += (mins) + " PM";
+    }
+    else{
+        timeDisplay += (hrs) + ":";
+        timeDisplay += (mins) + " AM";
+    }
+    alert("Thank you for your order! Your total is: $" + 
+          document.getElementById("total").value + 
+          ". Your food will be done at " + timeDisplay);
+}
+</script>
+<input type="submit" value="Submit Order" />
+
+
+
+</form>
+</body>
+</html>
